@@ -1,101 +1,119 @@
+"use client";
+
+import React, { useState } from "react";
 import Image from "next/image";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+const GitHubProfile = () => {
+  const [username, setUsername] = useState(""); 
+  const [userData, setUserData] = useState<any>(null); 
+  const [error, setError] = useState<string | null>(null); 
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const predefinedUsers = ["Spsunil8682", "mahendra2811", "siddhantdixit", "ishikkkkaaaa", "Anup451"]; 
+  const fetchGitHubUser = async (selectedUsername: string = username) => {
+    setError(null);
+    setUserData(null);
+    if (!selectedUsername) {
+      setError("Please enter or select a username.");
+      return;
+    }
+    try {
+      const response = await fetch(`https://api.github.com/users/${selectedUsername}`);
+      if (!response.ok) {
+        throw new Error("User not found");
+      }
+      const data = await response.json();
+      setUserData(data);
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto mt-8">
+      <h1 className="text-3xl font-bold text-center mb-4">GitHub Profile Viewer</h1>
+      <div className="flex flex-col items-center gap-4 mb-8">
+        {/* <div className="w-full flex items-center gap-4">
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                fetchGitHubUser();
+              }
+            }}
+            className="border border-gray-300 rounded-lg p-2 w-2/3"
+            placeholder="Enter GitHub username"
+          />
+          <button
+            onClick={() => fetchGitHubUser()}
+            className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Search
+          </button>
+        </div> */}
+        <div className="w-full">
+          <select
+            className="border border-gray-300 rounded-lg p-2 w-full"
+            defaultValue=""
+            onChange={(e) => {
+              const selectedUser = e.target.value;
+              if (selectedUser) {
+                setUsername(selectedUser);
+                fetchGitHubUser(selectedUser);
+              }
+            }}
           >
-            Read our docs
-          </a>
+            <option value="" disabled>
+              Select a username
+            </option>
+            {predefinedUsers.map((user) => (
+              <option key={user} value={user}>
+                {user}
+              </option>
+            ))}
+          </select>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+      </div>
+      {error && <p className="text-red-500 text-center">{error}</p>}
+      {userData && (
+        <div className="text-center">
           <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+            src={userData.avatar_url}
+            alt={`${userData.name || userData.login}'s avatar`}
+            className="w-32 h-32 rounded-full mx-auto"
+            width={100}
+            height={100}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <h1 className="text-2xl font-bold mt-4">
+            {userData.name || userData.login}
+          </h1>
+          <p className="text-gray-600">{userData.bio || "No bio available"}</p>
+          <div className="mt-4">
+            <p>
+              Followers: <span className="font-semibold">{userData.followers}</span>
+            </p>
+            <p>
+              Following: <span className="font-semibold">{userData.following}</span>
+            </p>
+            <p>
+              Repos: <span className="font-semibold">{userData.public_repos}</span>
+            </p>
+          </div>
+          <div className="mt-4">
+            <a
+              href={userData.html_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-gray-800 text-white px-4 py-2 rounded-md mt-2 hover:bg-gray-900"
+            >
+              View GitHub Profile
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default GitHubProfile;
